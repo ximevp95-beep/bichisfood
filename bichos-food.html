@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bicho's Food 🥗</title>
+<style>
+:root {
+  --bg: #F2F2F7;
+  --surface: #FFFFFF;
+  --border: #E5E5EA;
+  --border2: #D1D1D6;
+  --green: #34C759;
+  --green-dark: #248A3D;
+  --green-light: #E3F9EC;
+  --blue: #007AFF;
+  --blue-light: #E5F1FF;
+  --orange: #FF9500;
+  --orange-light: #FFF3E0;
+  --red: #FF3B30;
+  --red-light: #FFE8E7;
+  --indigo: #5856D6;
+  --text: #1C1C1E;
+  --text2: #3A3A3C;
+  --text3: #636366;
+  --text4: #AEAEB2;
+  --shadow: rgba(0,0,0,0.07);
+  --shadow2: rgba(0,0,0,0.13);
+  --r: 14px;
+  --r-sm: 10px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: var(--font); background:var(--bg); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
+
+/* HEADER */
+.hdr { background:rgba(255,255,255,0.96); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:1rem 1.5rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:200; }
+.hdr h1 { font-size:1.55rem; font-weight:800; line-height:1; letter-spacing:-0.02em; }
+.hdr h1 em { color:var(--green-dark); font-style:italic; }
+.hdr p { font-size:0.65rem; color:var(--text4); font-weight:600; letter-spacing:0.05em; margin-top:0.1rem; }
+
+/* TABS */
+.tabs { background:rgba(255,255,255,0.96); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); display:flex; padding:0 1rem; position:sticky; top:68px; z-index:190; overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar { display:none; }
+.tab-btn { font-family:var(--font); font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--text4); background:none; border:none; border-bottom:2.5px solid transparent; padding:0.75rem 0.9rem; cursor:pointer; transition:all .18s; white-space:nowrap; }
+.tab-btn:hover { color:var(--text3); }
+.tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); }
+
+/* PANELS */
+.panel { display:none; padding:1.25rem; max-width:1000px; margin:0 auto; }
+.panel.active { display:block; }
+
+/* SECTION HEAD */
+.sh { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem; }
+.sh h2 { font-size:1.15rem; font-weight:800; letter-spacing:-0.01em; }
+.btns { display:flex; gap:0.4rem; flex-wrap:wrap; }
+
+/* BUTTONS */
+.btn { font-family:var(--font); font-size:0.7rem; font-weight:700; letter-spacing:0.03em; padding:0.42rem 0.85rem; border-radius:20px; border:none; cursor:pointer; transition:all .15s; display:inline-flex; align-items:center; gap:0.25rem; }
+.btn-blue { background:var(--blue); color:#fff; }
+.btn-blue:hover { background:#0066D6; }
+.btn-green { background:var(--green); color:#fff; }
+.btn-green:hover { background:var(--green-dark); }
+.btn-ghost { background:var(--surface); color:var(--text3); border:1.5px solid var(--border2); }
+.btn-ghost:hover { background:var(--bg); }
+.btn-orange { background:var(--orange); color:#fff; }
+.btn-orange:hover { background:#e08500; }
+.btn-red { background:var(--red); color:#fff; }
+.btn-red:hover { background:#c9302c; }
+
+/* WEEK GRID */
+.week-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(265px,1fr)); gap:0.85rem; }
+.day-card { background:var(--surface); border-radius:var(--r); overflow:hidden; box-shadow:0 2px 10px var(--shadow); transition:box-shadow .2s; }
+.day-card:hover { box-shadow:0 4px 18px var(--shadow2); }
+.day-head { background:linear-gradient(135deg,#007AFF,#5856D6); padding:0.55rem 1rem; }
+.day-name { font-size:0.78rem; font-weight:800; color:#fff; letter-spacing:0.05em; text-transform:uppercase; }
+.meal-slot { padding:0.65rem 0.85rem; border-bottom:1px solid var(--border); }
+.meal-slot:last-child { border-bottom:none; }
+.meal-lbl { font-size:0.6rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.3rem; display:flex; align-items:center; justify-content:space-between; }
+.meal-lbl.lunch { color:var(--orange); }
+.meal-lbl.dinner { color:var(--indigo); }
+.meal-row { display:flex; gap:0.35rem; align-items:center; }
+.meal-sel { flex:1; background:var(--bg); border:1.5px solid var(--border); color:var(--text); font-family:var(--font); font-size:0.76rem; font-weight:600; border-radius:var(--r-sm); padding:0.38rem 0.5rem; cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23AEAEB2'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 0.5rem center; background-color:var(--bg); padding-right:1.5rem; transition:border-color .2s; }
+.meal-sel:focus { outline:none; border-color:var(--blue); }
+.btn-rnd { background:var(--orange-light); color:var(--orange); border:none; border-radius:8px; font-size:0.9rem; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; }
+.btn-rnd:hover { background:var(--orange); color:#fff; }
+.meal-note { width:100%; background:transparent; border:none; border-top:1px solid var(--border); color:var(--text3); font-family:var(--font); font-size:0.7rem; font-weight:500; padding:0.28rem 0; margin-top:0.3rem; resize:none; outline:none; }
+.meal-note::placeholder { color:var(--text4); }
+
+/* RECIPES */
+.rtbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.7rem; margin-bottom:1rem; }
+.rfilters { display:flex; gap:0.35rem; flex-wrap:wrap; }
+.fbtn { font-family:var(--font); font-size:0.67rem; font-weight:700; background:var(--surface); border:1.5px solid var(--border2); color:var(--text3); padding:0.32rem 0.7rem; border-radius:20px; cursor:pointer; transition:all .15s; }
+.fbtn:hover { border-color:var(--blue); color:var(--blue); }
+.fbtn.active { background:var(--blue); border-color:var(--blue); color:#fff; }
+.rgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(255px,1fr)); gap:0.85rem; }
+.rcard { background:var(--surface); border-radius:var(--r); padding:1rem; cursor:pointer; box-shadow:0 2px 10px var(--shadow); transition:all .2s; border:1.5px solid transparent; }
+.rcard:hover { box-shadow:0 4px 18px var(--shadow2); border-color:var(--blue); transform:translateY(-1px); }
+.rcard.custom { border-color:var(--green-light); }
+.tags { display:flex; gap:0.28rem; flex-wrap:wrap; margin-bottom:0.5rem; }
+.tag { font-size:0.57rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; padding:0.13rem 0.42rem; border-radius:20px; }
+.tag.airfryer { background:#FFF0E5; color:#D4500A; }
+.tag.proteina { background:#FFF8CC; color:#8B6000; }
+.tag.vegetal { background:var(--green-light); color:var(--green-dark); }
+.tag.legumbre { background:#EDE5FF; color:var(--indigo); }
+.tag.pescado { background:var(--blue-light); color:var(--blue); }
+.tag.quick { background:#F2F2F7; color:var(--text3); }
+.tag.custom { background:var(--green-light); color:var(--green-dark); }
+.rcard h3 { font-size:0.88rem; font-weight:800; color:var(--text); margin-bottom:0.28rem; line-height:1.25; }
+.rmeta { font-size:0.68rem; color:var(--text4); margin-bottom:0.45rem; display:flex; gap:0.55rem; font-weight:600; }
+.rdesc { font-size:0.77rem; color:var(--text3); line-height:1.5; font-weight:500; }
+.rdetail { display:none; margin-top:0.7rem; padding-top:0.7rem; border-top:1px solid var(--border); font-size:0.75rem; color:var(--text3); line-height:1.6; font-weight:500; }
+.rcard.open .rdetail { display:block; }
+.dlbl { font-size:0.6rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--blue); margin-top:0.5rem; margin-bottom:0.2rem; }
+.rdetail ul { padding-left:1rem; margin-bottom:0.35rem; }
+.rdetail li { margin-bottom:0.12rem; }
+.card-acts { display:flex; gap:0.35rem; flex-wrap:wrap; margin-top:0.7rem; }
+.btn-shop { font-family:var(--font); font-size:0.62rem; font-weight:700; border:none; border-radius:8px; padding:0.32rem 0.7rem; cursor:pointer; transition:all .2s; }
+.btn-shop.idle { background:var(--green-light); color:var(--green-dark); }
+.btn-shop.idle:hover { background:var(--green); color:#fff; }
+.btn-shop.added { background:var(--green); color:#fff; cursor:default; }
+.btn-del-r { font-family:var(--font); font-size:0.62rem; font-weight:700; background:var(--red-light); color:var(--red); border:none; border-radius:8px; padding:0.32rem 0.7rem; cursor:pointer; transition:all .15s; }
+.btn-del-r:hover { background:var(--red); color:#fff; }
+
+/* MODAL */
+.modal-ov { display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.3); backdrop-filter:blur(6px); align-items:center; justify-content:center; }
+.modal-ov.open { display:flex; }
+.modal { background:var(--surface); border-radius:20px; padding:1.4rem; width:min(510px,93vw); max-height:88vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.18); animation:slideUp .22s ease; }
+@keyframes slideUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+.modal h3 { font-size:1.1rem; font-weight:800; margin-bottom:1rem; }
+.frow { margin-bottom:0.8rem; }
+.flbl { font-size:0.65rem; font-weight:700; color:var(--text3); letter-spacing:0.06em; text-transform:uppercase; display:block; margin-bottom:0.28rem; }
+.finput,.ftextarea { width:100%; font-family:var(--font); font-size:0.82rem; font-weight:500; color:var(--text); background:var(--bg); border:1.5px solid var(--border); border-radius:var(--r-sm); padding:0.48rem 0.7rem; outline:none; transition:border-color .2s; }
+.finput:focus,.ftextarea:focus { border-color:var(--blue); }
+.ftextarea { resize:vertical; min-height:68px; }
+.tags-check { display:flex; flex-wrap:wrap; gap:0.35rem; }
+.tck-lbl { display:flex; align-items:center; gap:0.28rem; font-size:0.7rem; font-weight:600; background:var(--bg); border:1.5px solid var(--border); border-radius:20px; padding:0.28rem 0.62rem; cursor:pointer; transition:all .15s; }
+.tck-lbl input { display:none; }
+.tck-lbl.checked { background:var(--blue-light); border-color:var(--blue); color:var(--blue); }
+.mact { display:flex; gap:0.4rem; justify-content:flex-end; margin-top:1.1rem; }
+
+/* SHOPPING */
+.shop-hdr { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.7rem; margin-bottom:0.9rem; }
+.shop-hdr h2 { font-size:1.15rem; font-weight:800; }
+.add-form { background:var(--surface); border-radius:var(--r); padding:0.85rem; box-shadow:0 2px 10px var(--shadow); margin-bottom:1rem; display:flex; gap:0.45rem; flex-wrap:wrap; align-items:flex-end; }
+.add-form .fld { display:flex; flex-direction:column; gap:0.22rem; }
+.add-form .fld label { font-size:0.6rem; font-weight:700; color:var(--text4); letter-spacing:0.06em; text-transform:uppercase; }
+.add-form input,.add-form select { font-family:var(--font); font-size:0.8rem; font-weight:500; background:var(--bg); border:1.5px solid var(--border); color:var(--text); border-radius:var(--r-sm); padding:0.42rem 0.65rem; outline:none; transition:border-color .2s; }
+.add-form input:focus,.add-form select:focus { border-color:var(--blue); }
+.add-form .fld.name { flex:1; min-width:130px; }
+.add-form .fld.qty { width:85px; }
+.prog-card { background:var(--surface); border-radius:var(--r); padding:0.85rem 1rem; box-shadow:0 2px 10px var(--shadow); margin-bottom:1rem; display:flex; align-items:center; gap:0.9rem; }
+.prog-bg { flex:1; height:8px; background:var(--border); border-radius:10px; overflow:hidden; }
+.prog-fill { height:100%; background:linear-gradient(90deg,var(--green),#30D158); border-radius:10px; transition:width .3s; }
+.prog-stat { font-size:0.73rem; font-weight:700; color:var(--green-dark); white-space:nowrap; }
+.prog-pct { font-size:0.68rem; font-weight:600; color:var(--text4); }
+.shop-cats { display:flex; flex-direction:column; gap:1rem; }
+.scat h3 { font-size:0.62rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--text4); margin-bottom:0.45rem; padding-bottom:0.3rem; border-bottom:1px solid var(--border); }
+.sitems { display:flex; flex-direction:column; gap:0.28rem; }
+.sitem { display:flex; align-items:center; gap:0.65rem; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r-sm); padding:0.48rem 0.75rem; transition:all .15s; }
+.sitem:hover { border-color:var(--border2); }
+.sitem.done { opacity:0.5; }
+.sitem input[type=checkbox] { width:17px; height:17px; accent-color:var(--green); cursor:pointer; flex-shrink:0; }
+.sitem-name { flex:1; font-size:0.8rem; font-weight:600; }
+.sitem.done .sitem-name { text-decoration:line-through; color:var(--text4); }
+.sitem-qty { font-size:0.68rem; font-weight:600; color:var(--text4); min-width:52px; text-align:right; }
+.sitem-del { background:none; border:none; color:var(--text4); cursor:pointer; font-size:0.85rem; padding:0.1rem 0.25rem; border-radius:4px; transition:all .15s; }
+.sitem-del:hover { background:var(--red-light); color:var(--red); }
+
+/* STATS */
+.sgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:0.85rem; margin-bottom:1.1rem; }
+.sc { background:var(--surface); border-radius:var(--r); padding:1.1rem; box-shadow:0 2px 10px var(--shadow); text-align:center; }
+.sc .n { font-size:2.2rem; font-weight:800; line-height:1; letter-spacing:-0.02em; }
+.sc .l { font-size:0.7rem; font-weight:600; color:var(--text3); margin-top:0.3rem; }
+.week-sum { background:var(--surface); border-radius:var(--r); padding:1.1rem; box-shadow:0 2px 10px var(--shadow); }
+.week-sum h3 { font-size:0.82rem; font-weight:700; color:var(--text2); margin-bottom:0.7rem; }
+.sum-row { display:flex; align-items:center; padding:0.42rem 0; border-bottom:1px solid var(--border); font-size:0.77rem; gap:0.5rem; }
+.sum-row:last-child { border-bottom:none; }
+.sum-day { font-weight:700; color:var(--text3); width:78px; flex-shrink:0; }
+.sum-meals { color:var(--text); font-weight:600; flex:1; }
+.sum-empty { color:var(--text4); font-style:italic; }
+
+/* SHARE BANNER */
+.share-banner { background:var(--blue-light); border-bottom:2px solid var(--blue); padding:.9rem 1.25rem; }
+.share-banner.hidden { display:none; }
+.share-inner { max-width:700px; margin:0 auto; }
+.share-title { font-size:.85rem; font-weight:800; color:var(--blue); margin-bottom:.25rem; }
+.share-desc { font-size:.75rem; color:var(--text3); font-weight:500; margin-bottom:.6rem; line-height:1.4; }
+.share-row { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+.share-url-input { flex:1; min-width:150px; font-family:var(--font); font-size:.72rem; font-weight:600; background:var(--surface); border:1.5px solid var(--blue); border-radius:var(--r-sm); padding:.42rem .7rem; color:var(--text); outline:none; cursor:text; }
+
+/* TOAST */
+.toast { position:fixed; bottom:1.4rem; left:50%; transform:translateX(-50%) translateY(100px); background:var(--text); color:#fff; font-family:var(--font); font-size:0.8rem; font-weight:600; padding:0.6rem 1.2rem; border-radius:20px; box-shadow:0 4px 20px rgba(0,0,0,0.22); z-index:9999; transition:transform .28s ease; white-space:nowrap; pointer-events:none; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.ok { background:var(--green-dark); }
+.toast.info { background:var(--blue); }
+
+@media(max-width:560px){
+  .panel{padding:.9rem;}
+  .week-grid,.rgrid{grid-template-columns:1fr;}
+  .sgrid{grid-template-columns:1fr 1fr;}
+  .hdr h1{font-size:1.2rem;}
+}
+
+/* HEADER */
+.hdr { background:rgba(255,255,255,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:1rem 1.5rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:200; }
+.hdr h1 { font-family:var(--font); font-size:1.55rem; line-height:1; }
+.hdr h1 em { color:var(--green-dark); font-style:italic; }
+.hdr p { font-size:0.65rem; color:var(--text4); font-weight:700; letter-spacing:0.05em; margin-top:0.1rem; }
+
+/* TABS */
+.tabs { background:rgba(255,255,255,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); display:flex; padding:0 1rem; position:sticky; top:68px; z-index:190; overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar { display:none; }
+.tab-btn { font-family:var(--font); font-size:0.7rem; font-weight:800; letter-spacing:0.05em; text-transform:uppercase; color:var(--text4); background:none; border:none; border-bottom:2.5px solid transparent; padding:0.75rem 0.9rem; cursor:pointer; transition:all .18s; white-space:nowrap; }
+.tab-btn:hover { color:var(--text3); }
+.tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); }
+
+/* PANELS */
+.panel { display:none; padding:1.25rem; max-width:1000px; margin:0 auto; }
+.panel.active { display:block; }
+
+/* SECTION HEAD */
+.sh { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem; }
+.sh h2 { font-family:var(--font); font-size:1.15rem; }
+.btns { display:flex; gap:0.4rem; flex-wrap:wrap; }
+
+/* BUTTONS */
+.btn { font-family:var(--font); font-size:0.7rem; font-weight:800; letter-spacing:0.03em; padding:0.42rem 0.85rem; border-radius:20px; border:none; cursor:pointer; transition:all .15s; display:inline-flex; align-items:center; gap:0.25rem; }
+.btn-blue { background:var(--blue); color:#fff; }
+.btn-blue:hover { background:#0066D6; }
+.btn-green { background:var(--green); color:#fff; }
+.btn-green:hover { background:var(--green-dark); }
+.btn-ghost { background:var(--surface); color:var(--text3); border:1.5px solid var(--border2); }
+.btn-ghost:hover { background:var(--bg); }
+.btn-orange { background:var(--orange); color:#fff; }
+.btn-orange:hover { background:#e08500; }
+.btn-red { background:var(--red); color:#fff; }
+.btn-red:hover { background:#c9302c; }
+
+/* WEEK GRID */
+.week-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(265px,1fr)); gap:0.85rem; }
+.day-card { background:var(--surface); border-radius:var(--r); overflow:hidden; box-shadow:0 2px 10px var(--shadow); transition:box-shadow .2s; }
+.day-card:hover { box-shadow:0 4px 18px var(--shadow2); }
+.day-head { background:linear-gradient(135deg,#007AFF,#5856D6); padding:0.55rem 1rem; }
+.day-name { font-size:0.78rem; font-weight:800; color:#fff; letter-spacing:0.05em; text-transform:uppercase; }
+.meal-slot { padding:0.65rem 0.85rem; border-bottom:1px solid var(--border); }
+.meal-slot:last-child { border-bottom:none; }
+.meal-lbl { font-size:0.6rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.3rem; display:flex; align-items:center; justify-content:space-between; }
+.meal-lbl.lunch { color:var(--orange); }
+.meal-lbl.dinner { color:var(--indigo); }
+.meal-row { display:flex; gap:0.35rem; align-items:center; }
+.meal-sel { flex:1; background:var(--bg); border:1.5px solid var(--border); color:var(--text); font-family:var(--font); font-size:0.76rem; font-weight:600; border-radius:var(--r-sm); padding:0.38rem 0.5rem; cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23AEAEB2'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 0.5rem center; background-color:var(--bg); padding-right:1.5rem; transition:border-color .2s; }
+.meal-sel:focus { outline:none; border-color:var(--blue); }
+.btn-rnd { background:var(--orange-light); color:var(--orange); border:none; border-radius:8px; font-size:0.9rem; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; }
+.btn-rnd:hover { background:var(--orange); color:#fff; transform:rotate(25deg); }
+.meal-note { width:100%; background:transparent; border:none; border-top:1px solid var(--border); color:var(--text3); font-family:var(--font); font-size:0.7rem; font-weight:500; padding:0.28rem 0; margin-top:0.3rem; resize:none; outline:none; }
+.meal-note::placeholder { color:var(--text4); }
+
+/* RECIPES */
+.rtbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.7rem; margin-bottom:1rem; }
+.rfilters { display:flex; gap:0.35rem; flex-wrap:wrap; }
+.fbtn { font-family:var(--font); font-size:0.67rem; font-weight:700; background:var(--surface); border:1.5px solid var(--border2); color:var(--text3); padding:0.32rem 0.7rem; border-radius:20px; cursor:pointer; transition:all .15s; }
+.fbtn:hover { border-color:var(--blue); color:var(--blue); }
+.fbtn.active { background:var(--blue); border-color:var(--blue); color:#fff; }
+.rgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(255px,1fr)); gap:0.85rem; }
+.rcard { background:var(--surface); border-radius:var(--r); padding:1rem; cursor:pointer; box-shadow:0 2px 10px var(--shadow); transition:all .2s; border:1.5px solid transparent; }
+.rcard:hover { box-shadow:0 4px 18px var(--shadow2); border-color:var(--blue); transform:translateY(-1px); }
+.rcard.custom { border-color:var(--green-light); }
+.tags { display:flex; gap:0.28rem; flex-wrap:wrap; margin-bottom:0.5rem; }
+.tag { font-size:0.57rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; padding:0.13rem 0.42rem; border-radius:20px; }
+.tag.airfryer { background:#FFF0E5; color:#D4500A; }
+.tag.proteina { background:#FFF8CC; color:#8B6000; }
+.tag.vegetal { background:var(--green-light); color:var(--green-dark); }
+.tag.legumbre { background:#EDE5FF; color:var(--indigo); }
+.tag.pescado { background:var(--blue-light); color:var(--blue); }
+.tag.quick { background:#F2F2F7; color:var(--text3); }
+.tag.custom { background:var(--green-light); color:var(--green-dark); }
+.rcard h3 { font-size:0.88rem; font-weight:800; color:var(--text); margin-bottom:0.28rem; line-height:1.25; }
+.rmeta { font-size:0.68rem; color:var(--text4); margin-bottom:0.45rem; display:flex; gap:0.55rem; font-weight:700; }
+.rdesc { font-size:0.77rem; color:var(--text3); line-height:1.5; font-weight:500; }
+.rdetail { display:none; margin-top:0.7rem; padding-top:0.7rem; border-top:1px solid var(--border); font-size:0.75rem; color:var(--text3); line-height:1.6; font-weight:500; }
+.rcard.open .rdetail { display:block; }
+.dlbl { font-size:0.6rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--blue); margin-top:0.5rem; margin-bottom:0.2rem; }
+.rdetail ul { padding-left:1rem; margin-bottom:0.35rem; }
+.rdetail li { margin-bottom:0.12rem; }
+.card-acts { display:flex; gap:0.35rem; flex-wrap:wrap; margin-top:0.7rem; }
+.btn-shop { font-family:var(--font); font-size:0.62rem; font-weight:800; border:none; border-radius:8px; padding:0.32rem 0.7rem; cursor:pointer; transition:all .2s; }
+.btn-shop.idle { background:var(--green-light); color:var(--green-dark); }
+.btn-shop.idle:hover { background:var(--green); color:#fff; }
+.btn-shop.added { background:var(--green); color:#fff; cursor:default; }
+.btn-del-r { font-family:var(--font); font-size:0.62rem; font-weight:800; background:var(--red-light); color:var(--red); border:none; border-radius:8px; padding:0.32rem 0.7rem; cursor:pointer; transition:all .15s; }
+.btn-del-r:hover { background:var(--red); color:#fff; }
+
+/* MODAL */
+.modal-ov { display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.3); backdrop-filter:blur(6px); align-items:center; justify-content:center; }
+.modal-ov.open { display:flex; }
+.modal { background:var(--surface); border-radius:20px; padding:1.4rem; width:min(510px,93vw); max-height:88vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.18); animation:slideUp .22s ease; }
+@keyframes slideUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+.modal h3 { font-family:var(--font); font-size:1.15rem; margin-bottom:1rem; }
+.frow { margin-bottom:0.8rem; }
+.flbl { font-size:0.65rem; font-weight:800; color:var(--text3); letter-spacing:0.06em; text-transform:uppercase; display:block; margin-bottom:0.28rem; }
+.finput,.ftextarea { width:100%; font-family:var(--font); font-size:0.82rem; font-weight:600; color:var(--text); background:var(--bg); border:1.5px solid var(--border); border-radius:var(--r-sm); padding:0.48rem 0.7rem; outline:none; transition:border-color .2s; }
+.finput:focus,.ftextarea:focus { border-color:var(--blue); }
+.ftextarea { resize:vertical; min-height:68px; }
+.tags-check { display:flex; flex-wrap:wrap; gap:0.35rem; }
+.tck-lbl { display:flex; align-items:center; gap:0.28rem; font-size:0.7rem; font-weight:700; background:var(--bg); border:1.5px solid var(--border); border-radius:20px; padding:0.28rem 0.62rem; cursor:pointer; transition:all .15s; user-select:none; }
+.tck-lbl.active { background:var(--blue-light); border-color:var(--blue); color:var(--blue); }
+.tck-lbl input { display:none; }
+.mact { display:flex; gap:0.4rem; justify-content:flex-end; margin-top:1.1rem; }
+
+/* SHOPPING */
+.shop-hdr { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.7rem; margin-bottom:0.9rem; }
+.shop-hdr h2 { font-family:var(--font); font-size:1.15rem; }
+.add-form { background:var(--surface); border-radius:var(--r); padding:0.85rem; box-shadow:0 2px 10px var(--shadow); margin-bottom:1rem; display:flex; gap:0.45rem; flex-wrap:wrap; align-items:flex-end; }
+.add-form .fld { display:flex; flex-direction:column; gap:0.22rem; }
+.add-form .fld label { font-size:0.6rem; font-weight:800; color:var(--text4); letter-spacing:0.06em; text-transform:uppercase; }
+.add-form input,.add-form select { font-family:var(--font); font-size:0.8rem; font-weight:600; background:var(--bg); border:1.5px solid var(--border); color:var(--text); border-radius:var(--r-sm); padding:0.42rem 0.65rem; outline:none; transition:border-color .2s; }
+.add-form input:focus,.add-form select:focus { border-color:var(--blue); }
+.add-form .fld.name { flex:1; min-width:130px; }
+.add-form .fld.qty { width:85px; }
+.prog-card { background:var(--surface); border-radius:var(--r); padding:0.85rem 1rem; box-shadow:0 2px 10px var(--shadow); margin-bottom:1rem; display:flex; align-items:center; gap:0.9rem; }
+.prog-bg { flex:1; height:8px; background:var(--border); border-radius:10px; overflow:hidden; }
+.prog-fill { height:100%; background:linear-gradient(90deg,var(--green),#30D158); border-radius:10px; transition:width .3s; }
+.prog-stat { font-size:0.73rem; font-weight:800; color:var(--green-dark); white-space:nowrap; }
+.prog-pct { font-size:0.68rem; font-weight:700; color:var(--text4); }
+.shop-cats { display:flex; flex-direction:column; gap:1rem; }
+.scat h3 { font-size:0.62rem; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; color:var(--text4); margin-bottom:0.45rem; padding-bottom:0.3rem; border-bottom:1px solid var(--border); }
+.sitems { display:flex; flex-direction:column; gap:0.28rem; }
+.sitem { display:flex; align-items:center; gap:0.65rem; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r-sm); padding:0.48rem 0.75rem; transition:all .15s; }
+.sitem:hover { border-color:var(--border2); }
+.sitem.done { opacity:0.5; }
+.sitem input[type=checkbox] { width:17px; height:17px; accent-color:var(--green); cursor:pointer; flex-shrink:0; }
+.sitem-name { flex:1; font-size:0.8rem; font-weight:600; }
+.sitem.done .sitem-name { text-decoration:line-through; color:var(--text4); }
+.sitem-qty { font-size:0.68rem; font-weight:700; color:var(--text4); min-width:52px; text-align:right; }
+.sitem-del { background:none; border:none; color:var(--text4); cursor:pointer; font-size:0.85rem; padding:0.1rem 0.25rem; border-radius:4px; transition:all .15s; }
+.sitem-del:hover { background:var(--red-light); color:var(--red); }
+
+/* STATS */
+.sgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:0.85rem; margin-bottom:1.1rem; }
+.sc { background:var(--surface); border-radius:var(--r); padding:1.1rem; box-shadow:0 2px 10px var(--shadow); text-align:center; }
+.sc .n { font-family:var(--font); font-size:2.2rem; line-height:1; }
+.sc .l { font-size:0.7rem; font-weight:700; color:var(--text3); margin-top:0.3rem; }
+.week-sum { background:var(--surface); border-radius:var(--r); padding:1.1rem; box-shadow:0 2px 10px var(--shadow); }
+.week-sum h3 { font-size:0.82rem; font-weight:800; color:var(--text2); margin-bottom:0.7rem; }
+.sum-row { display:flex; align-items:center; padding:0.42rem 0; border-bottom:1px solid var(--border); font-size:0.77rem; gap:0.5rem; }
+.sum-row:last-child { border-bottom:none; }
+.sum-day { font-weight:800; color:var(--text3); width:78px; flex-shrink:0; }
+.sum-meals { color:var(--text); font-weight:600; flex:1; }
+.sum-empty { color:var(--text4); font-style:italic; }
+
+/* SHARE BANNER */
+.share-banner { background:var(--blue-light); border-bottom:2px solid var(--blue); padding:.9rem 1.25rem; position:sticky; top:68px; z-index:195; animation:slideUp .22s ease; }
+.share-banner.hidden { display:none; }
+.share-inner { max-width:700px; margin:0 auto; }
+.share-title { font-size:.85rem; font-weight:800; color:var(--blue); margin-bottom:.25rem; }
+.share-desc { font-size:.75rem; color:var(--text3); font-weight:500; margin-bottom:.6rem; line-height:1.4; }
+.share-row { display:flex; gap:.5rem; align-items:center; }
+.share-url-input { flex:1; font-family:var(--font); font-size:.72rem; font-weight:600; background:var(--surface); border:1.5px solid var(--blue); border-radius:var(--r-sm); padding:.42rem .7rem; color:var(--text); outline:none; cursor:text; min-width:0; }
+
+/* TOAST */
+.toast { position:fixed; bottom:1.4rem; left:50%; transform:translateX(-50%) translateY(100px); background:var(--text); color:#fff; font-family:var(--font); font-size:0.8rem; font-weight:700; padding:0.6rem 1.2rem; border-radius:20px; box-shadow:0 4px 20px rgba(0,0,0,0.22); z-index:9999; transition:transform .28s ease; white-space:nowrap; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.ok { background:var(--green-dark); }
+.toast.info { background:var(--blue); }
+
+@media(max-width:560px){
+  .panel{padding:.9rem;}
+  .week-grid,.rgrid{grid-template-columns:1fr;}
+  .sgrid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <h1>Bicho's <em>Food</em> 🥗</h1>
+    <p>Menú · Recetas · Compra · Stats</p>
+  </div>
+  <button class="btn btn-blue" onclick="generateShareLink()">🔗 Compartir</button>
+</div>
+
+<!-- SHARE BANNER -->
+<div id="share-banner" class="share-banner hidden">
+  <div class="share-inner">
+    <div class="share-title">🔗 Link listo para compartir</div>
+    <p class="share-desc">Copia este link y mándaselo a tu pareja por WhatsApp. Al abrirlo cargará automáticamente tu menú, lista de compra y recetas personalizadas.</p>
+    <div class="share-row">
+      <input id="share-url-input" class="share-url-input" readonly onclick="this.select()">
+      <button class="btn btn-blue" onclick="copyShareUrl()">📋 Copiar link</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('share-banner').classList.add('hidden')">✕</button>
+    </div>
+    <p style="font-size:.68rem;color:var(--text4);margin-top:.45rem;font-weight:600">⚠️ Este link incluye todos tus datos. Cada vez que hagas cambios, genera un nuevo link.</p>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('menu',this)">📅 Menú</button>
+  <button class="tab-btn" onclick="showTab('recipes',this)">🍳 Recetas</button>
+  <button class="tab-btn" onclick="showTab('shop',this)">🛒 Compra</button>
+  <button class="tab-btn" onclick="showTab('stats',this)">📊 Resumen</button>
+</div>
+
+<!-- MENU -->
+<div id="panel-menu" class="panel active">
+  <div class="sh">
+    <h2>Menú semanal</h2>
+    <div class="btns">
+      <button class="btn btn-orange" onclick="randomizeAll()">🎲 Aleatorio semana</button>
+      <button class="btn btn-blue" onclick="menuToShop()">⚡ Todo a la compra</button>
+      <button class="btn btn-ghost" onclick="clearMenu()">🗑 Limpiar</button>
+    </div>
+  </div>
+  <div class="week-grid" id="week-grid"></div>
+</div>
+
+<!-- RECETAS -->
+<div id="panel-recipes" class="panel">
+  <div class="rtbar">
+    <div class="rfilters">
+      <button class="fbtn active" onclick="filterR('all',this)">Todas</button>
+      <button class="fbtn" onclick="filterR('airfryer',this)">🔥 Airfryer</button>
+      <button class="fbtn" onclick="filterR('proteina',this)">💪 Proteína</button>
+      <button class="fbtn" onclick="filterR('pescado',this)">🐟 Pescado</button>
+      <button class="fbtn" onclick="filterR('vegetal',this)">🌱 Vegetal</button>
+      <button class="fbtn" onclick="filterR('legumbre',this)">🫘 Legumbre</button>
+      <button class="fbtn" onclick="filterR('quick',this)">⚡ Quick</button>
+    </div>
+    <button class="btn btn-green" onclick="openModal()">+ Nueva receta</button>
+  </div>
+  <div class="rgrid" id="rgrid"></div>
+</div>
+
+<!-- COMPRA -->
+<div id="panel-shop" class="panel">
+  <div class="shop-hdr">
+    <h2>Lista de compra 🛒</h2>
+    <div class="btns">
+      <button class="btn btn-green" onclick="menuToShop()">⚡ Auto del menú</button>
+      <button class="btn btn-ghost" onclick="clearDone()">✓ Limpiar comprado</button>
+      <button class="btn btn-red" onclick="clearAll()">🗑 Vaciar</button>
+    </div>
+  </div>
+  <div class="add-form">
+    <div class="fld name"><label>Producto</label><input id="si-name" placeholder="Ej: Tomates, Leche..." onkeydown="if(event.key==='Enter')addSI()"></div>
+    <div class="fld qty"><label>Cantidad</label><input id="si-qty" placeholder="Ej: 500g"></div>
+    <div class="fld" style="min-width:130px"><label>Categoría</label>
+      <select id="si-cat">
+        <option>Otros</option>
+        <option>Frutas y verduras</option>
+        <option>Carnes y aves</option>
+        <option>Pescados</option>
+        <option>Lácteos y huevos</option>
+        <option>Legumbres y cereales</option>
+        <option>Conservas</option>
+      </select>
+    </div>
+    <button class="btn btn-blue" style="align-self:flex-end" onclick="addSI()">+ Añadir</button>
+  </div>
+  <div class="prog-card">
+    <span style="font-size:.73rem;font-weight:700;color:var(--text3)">Progreso:</span>
+    <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <span class="prog-stat" id="prog-stat">0/0</span>
+    <span class="prog-pct" id="prog-pct">0%</span>
+  </div>
+  <div class="shop-cats" id="shop-cats"></div>
+</div>
+
+<!-- STATS -->
+<div id="panel-stats" class="panel">
+  <div class="sh"><h2>📊 Resumen de la semana</h2></div>
+  <div class="sgrid" id="sgrid"></div>
+  <div class="week-sum">
+    <h3>Vista rápida del menú</h3>
+    <div id="sum-list"></div>
+  </div>
+</div>
+
+<!-- MODAL NUEVA RECETA -->
+<div class="modal-ov" id="modal-ov" onclick="closeModalOut(event)">
+  <div class="modal">
+    <h3>✨ Nueva receta</h3>
+    <div class="frow"><label class="flbl">Nombre *</label><input class="finput" id="r-name" placeholder="Ej: Pollo al limón con ensalada"></div>
+    <div class="frow" style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
+      <div><label class="flbl">Tiempo</label><input class="finput" id="r-time" placeholder="20 min"></div>
+      <div><label class="flbl">Temperatura</label><input class="finput" id="r-temp" placeholder="190°C"></div>
+    </div>
+    <div class="frow"><label class="flbl">Descripción *</label><textarea class="ftextarea" id="r-desc" placeholder="Breve descripción del plato..."></textarea></div>
+    <div class="frow"><label class="flbl">Ingredientes (uno por línea) *</label><textarea class="ftextarea" id="r-ing" placeholder="Pechuga de pollo&#10;Limón&#10;Aceite de oliva"></textarea></div>
+    <div class="frow"><label class="flbl">Preparación</label><textarea class="ftextarea" id="r-steps" placeholder="Pasos de preparación..."></textarea></div>
+    <div class="frow"><label class="flbl">Etiquetas</label>
+      <div class="tags-check">
+        <span class="tck-lbl" onclick="toggleTag(this,'airfryer')" data-tag="airfryer">🔥 Airfryer</span>
+        <span class="tck-lbl" onclick="toggleTag(this,'proteina')" data-tag="proteina">💪 Proteína</span>
+        <span class="tck-lbl" onclick="toggleTag(this,'pescado')" data-tag="pescado">🐟 Pescado</span>
+        <span class="tck-lbl" onclick="toggleTag(this,'vegetal')" data-tag="vegetal">🌱 Vegetal</span>
+        <span class="tck-lbl" onclick="toggleTag(this,'legumbre')" data-tag="legumbre">🫘 Legumbre</span>
+        <span class="tck-lbl" onclick="toggleTag(this,'quick')" data-tag="quick">⚡ Quick</span>
+      </div>
+    </div>
+    <div class="mact">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-green" onclick="saveRecipe()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONSTANTS ──────────────────────────────
+const DAYS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const SCATS = ['Frutas y verduras','Carnes y aves','Pescados','Lácteos y huevos','Legumbres y cereales','Conservas','Otros'];
+const LS_KEY = 'bichos_food_v2';
+
+// ── BASE RECIPES ───────────────────────────
+const BASE = [
+  {id:'r1',name:'Muslos de pollo al limón',tags:['airfryer','proteina','quick'],time:'25 min',temp:'200°C',desc:'Muslos jugosos con corteza dorada, marinados con limón, ajo y hierbas.',ingredients:['Muslos de pollo','Limón','Ajo','Aceite de oliva','Romero','Sal y pimienta'],steps:'Marinar 10 min con limón, ajo rallado, aceite y especias. Airfryer 200°C 20-22 min dando vuelta a mitad.',shopItems:[['Muslos de pollo','500g','Carnes y aves'],['Limón','2','Frutas y verduras'],['Ajo','1 cabeza','Frutas y verduras']]},
+  {id:'r2',name:'Salmón con boniato y brócoli',tags:['airfryer','pescado'],time:'20 min',temp:'180°C',desc:'Salmón en airfryer con piel crujiente, boniato asado dulce y brócoli tierno.',ingredients:['Lomo de salmón','Boniato','Brócoli','Aceite de oliva','Pimentón'],steps:'Boniato en cubos 180°C 10 min. Añadir salmón y brócoli, 8-10 min más.',shopItems:[['Salmón (lomo)','300g','Pescados'],['Boniato','2','Frutas y verduras'],['Brócoli','1','Frutas y verduras']]},
+  {id:'r3',name:'Garbanzos crujientes con verduras',tags:['airfryer','legumbre','vegetal'],time:'25 min',temp:'180°C',desc:'Garbanzos dorados con comino y pimentón sobre cama de verduras de temporada.',ingredients:['Garbanzos cocidos (bote)','Calabacín','Zanahoria','Cebolla','Comino','Pimentón ahumado'],steps:'Verduras en cubos 180°C 15 min. Añadir garbanzos con especias, 5 min más agitando.',shopItems:[['Garbanzos (bote)','1','Conservas'],['Calabacín','2','Frutas y verduras'],['Zanahoria','2','Frutas y verduras']]},
+  {id:'r4',name:'Merluza empanada crujiente',tags:['airfryer','pescado'],time:'15 min',temp:'180°C',desc:'Filetes de merluza rebozados con harina de almendra. Crujiente sin freír.',ingredients:['Filetes de merluza','Harina de almendra','Huevo','Pan rallado','Limón'],steps:'Pasar filetes por harina, huevo y pan rallado. Airfryer 180°C 12-14 min.',shopItems:[['Merluza (filetes)','400g','Pescados'],['Harina de almendra','100g','Otros'],['Huevo','2','Lácteos y huevos']]},
+  {id:'r5',name:'Bowl de quinoa y huevo pochado',tags:['vegetal','proteina','quick'],time:'20 min',temp:'—',desc:'Bowl completo con quinoa, verduras, aguacate y huevo pochado.',ingredients:['Quinoa','Aguacate','Tomates cherry','Espinacas','Huevo','Limón'],steps:'Cocer quinoa 15 min. Montar bowl con espinacas, tomate, aguacate y huevo pochado.',shopItems:[['Quinoa','200g','Legumbres y cereales'],['Aguacate','2','Frutas y verduras'],['Tomates cherry','200g','Frutas y verduras'],['Espinacas','1 bolsa','Frutas y verduras']]},
+  {id:'r6',name:'Wrap de pollo y hummus',tags:['proteina','quick'],time:'15 min',temp:'—',desc:'Wrap con pechuga a la plancha, hummus, lechuga, tomate y cebolla morada.',ingredients:['Tortilla integral','Pechuga de pollo','Hummus','Lechuga','Tomate','Cebolla morada'],steps:'Cocinar pollo en tiras. Untar tortilla con hummus, añadir verduras y pollo. Enrollar.',shopItems:[['Tortilla integral','paquete','Legumbres y cereales'],['Pechuga de pollo','300g','Carnes y aves'],['Hummus','1 tarro','Conservas']]},
+  {id:'r7',name:'Espárragos envueltos en beicon',tags:['airfryer','proteina','quick'],time:'15 min',temp:'190°C',desc:'Espárragos crujientes envueltos en beicon dorado. Cena ligera perfecta.',ingredients:['Espárragos verdes','Beicon','Aceite de oliva'],steps:'Envolver espárragos con beicon. Airfryer 190°C 12-15 min hasta dorado.',shopItems:[['Espárragos verdes','1 manojo','Frutas y verduras'],['Beicon','150g','Carnes y aves']]},
+  {id:'r8',name:'Lentejas batch cooking',tags:['legumbre','vegetal'],time:'35 min',temp:'—',desc:'Lentejas estofadas perfectas para hacer en cantidad el domingo y usar toda la semana.',ingredients:['Lentejas','Zanahoria','Apio','Tomate triturado','Cebolla','Ajo','Pimentón'],steps:'Sofreír cebolla y ajo. Añadir verduras, lentejas y especias. Cocer 25-30 min.',shopItems:[['Lentejas','500g','Legumbres y cereales'],['Zanahoria','3','Frutas y verduras'],['Tomate triturado','1 bote','Conservas']]},
+  {id:'r9',name:'Pizza healthy en pita',tags:['airfryer','quick'],time:'10 min',temp:'190°C',desc:'Pan pita con tomate, mozzarella y toppings. Crujiente en minutos.',ingredients:['Pan pita','Tomate triturado','Mozzarella','Champiñones','Orégano'],steps:'Untar pita con tomate. Añadir mozzarella y toppings. Airfryer 190°C 8-10 min.',shopItems:[['Pan pita','paquete','Otros'],['Mozzarella','1','Lácteos y huevos'],['Champiñones','200g','Frutas y verduras']]},
+  {id:'r10',name:'Zanahorias al tomillo con feta',tags:['airfryer','vegetal','quick'],time:'20 min',temp:'180°C',desc:'Zanahorias asadas con tomillo y miel, coronadas con queso feta y nueces.',ingredients:['Zanahorias','Tomillo','Miel','Queso feta','Nueces'],steps:'Zanahorias con aceite, tomillo y miel. Airfryer 180°C 18-20 min. Servir con feta desmenuzado.',shopItems:[['Zanahorias','6','Frutas y verduras'],['Queso feta','100g','Lácteos y huevos'],['Miel','1 bote','Otros']]},
+  {id:'r11',name:'Crema de verduras asadas',tags:['airfryer','vegetal'],time:'30 min',temp:'190°C',desc:'Verduras asadas en airfryer y trituradas con caldo. Cremosa y sin nata.',ingredients:['Calabacín','Puerro','Zanahoria','Cebolla','Caldo de verduras'],steps:'Verduras en trozos a 190°C 20 min. Triturar con caldo hasta textura cremosa.',shopItems:[['Calabacín','2','Frutas y verduras'],['Puerro','2','Frutas y verduras'],['Caldo de verduras','500ml','Conservas']]},
+  {id:'r12',name:'Tortilla española con ensalada aguacate',tags:['proteina','quick'],time:'20 min',temp:'—',desc:'Tortilla jugosa de patata y cebolla, con ensalada fresca de aguacate.',ingredients:['Huevos','Patata','Cebolla','Aceite de oliva','Aguacate','Tomate'],steps:'Pochar patata y cebolla. Mezclar con huevo batido y cuajar la tortilla. Servir con ensalada.',shopItems:[['Huevos','6','Lácteos y huevos'],['Patata','2','Frutas y verduras'],['Aguacate','1','Frutas y verduras']]},
+  {id:'r13',name:'Pasta integral con atún',tags:['quick','proteina'],time:'20 min',temp:'—',desc:'Pasta integral con atún, tomate fresco, aceitunas y albahaca. Sabor mediterráneo.',ingredients:['Pasta integral','Atún en conserva','Tomate','Aceitunas negras','Albahaca'],steps:'Cocer pasta. Sofreír ajo, añadir tomate y atún. Mezclar con pasta y aceitunas.',shopItems:[['Pasta integral','400g','Legumbres y cereales'],['Atún (lata)','2','Conservas'],['Aceitunas','1 bote','Conservas']]},
+  {id:'r14',name:'Albóndigas de salmón y sésamo',tags:['airfryer','pescado'],time:'20 min',temp:'190°C',desc:'Albóndigas de salmón con sésamo y cebollino. Ligeras y llenas de omega-3.',ingredients:['Salmón fresco picado','Pan rallado','Huevo','Sésamo','Cebollino'],steps:'Mezclar todo. Formar bolitas. Spray de aceite. Airfryer 190°C 10-12 min.',shopItems:[['Salmón fresco','400g','Pescados'],['Sésamo','1 bote','Otros']]},
+  {id:'r15',name:'Plátano con chocolate negro',tags:['airfryer','quick'],time:'8 min',temp:'180°C',desc:'¡El postre más adictivo y sano! 3 ingredientes, 5 minutos.',ingredients:['Plátano','Chocolate negro 70%+','Canela opcional'],steps:'Cortar plátano. Añadir onzas de chocolate. Airfryer 180°C 5 min. Canela al final.',shopItems:[['Plátano','4','Frutas y verduras'],['Chocolate negro 70%','1 tableta','Otros']]}
+];
+
+// ── STATE ──────────────────────────────────
+let S = { recipes:[], menu:{}, shop:[], addedToShop:[] };
+let filter = 'all';
+
+function initMenu(){
+  const m={};
+  DAYS.forEach(d=>{ m[d+'-l']=''; m[d+'-d']=''; m[d+'-ln']=''; m[d+'-dn']=''; });
+  return m;
+}
+function defaultShop(){
+  return [
+    {id:'ds1',name:'Huevos',qty:'1 docena',cat:'Lácteos y huevos',done:false},
+    {id:'ds2',name:'Yogur natural',qty:'4 ud',cat:'Lácteos y huevos',done:false},
+    {id:'ds3',name:'Aguacate',qty:'4 ud',cat:'Frutas y verduras',done:false},
+    {id:'ds4',name:'Plátanos',qty:'1 racimo',cat:'Frutas y verduras',done:false},
+    {id:'ds5',name:'Espinacas',qty:'1 bolsa',cat:'Frutas y verduras',done:false},
+    {id:'ds6',name:'Frutos rojos',qty:'200g',cat:'Frutas y verduras',done:false},
+    {id:'ds7',name:'Aceite de oliva AOVE',qty:'1 botella',cat:'Otros',done:false},
+    {id:'ds8',name:'Chocolate negro 70%',qty:'1 tableta',cat:'Otros',done:false},
+    {id:'ds9',name:'Hummus',qty:'1 tarro',cat:'Conservas',done:false},
+    {id:'ds10',name:'Quinoa',qty:'500g',cat:'Legumbres y cereales',done:false},
+    {id:'ds11',name:'Arroz integral',qty:'500g',cat:'Legumbres y cereales',done:false},
+    {id:'ds12',name:'Frutos secos (mix)',qty:'200g',cat:'Otros',done:false}
+  ];
+}
+
+function load(){
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){ const p=JSON.parse(raw); S.recipes=p.recipes||BASE; S.menu=p.menu||initMenu(); S.shop=p.shop||defaultShop(); S.addedToShop=p.addedToShop||[]; }
+    else { S.recipes=JSON.parse(JSON.stringify(BASE)); S.menu=initMenu(); S.shop=defaultShop(); S.addedToShop=[]; }
+  } catch(e){ S.recipes=JSON.parse(JSON.stringify(BASE)); S.menu=initMenu(); S.shop=defaultShop(); S.addedToShop=[]; }
+}
+function save(){
+  try{ localStorage.setItem(LS_KEY,JSON.stringify(S)); } catch(e){}
+}
+
+// ── RENDER MENU ────────────────────────────
+function renderMenu(){
+  const g=document.getElementById('week-grid'); g.innerHTML='';
+  DAYS.forEach(d=>{
+    const div=document.createElement('div'); div.className='day-card';
+    div.innerHTML=`<div class="day-head"><span class="day-name">${d}</span></div>${mslot(d,'l','☀️','Almuerzo','lunch')}${mslot(d,'d','🌙','Cena','dinner')}`;
+    g.appendChild(div);
+  });
+}
+function mslot(d,k,em,lbl,cls){
+  const vk=d+'-'+k, nk=d+'-'+k+'n';
+  const opts=S.recipes.map(r=>`<option value="${r.id}"${S.menu[vk]===r.id?' selected':''}>${r.name}</option>`).join('');
+  return `<div class="meal-slot">
+    <div class="meal-lbl ${cls}">${em} ${lbl}<button class="btn-rnd" title="Aleatorio" onclick="rndMeal('${d}','${k}')">🎲</button></div>
+    <div class="meal-row">
+      <select class="meal-sel" onchange="setMeal('${d}','${k}',this.value)"><option value="">— Elige receta —</option>${opts}</select>
+    </div>
+    <textarea class="meal-note" rows="1" placeholder="Nota: sin sal, versión vegana..." onchange="setNote('${d}','${k}n',this.value)">${S.menu[nk]||''}</textarea>
+  </div>`;
+}
+function setMeal(d,k,v){ S.menu[d+'-'+k]=v; save(); }
+function setNote(d,nk,v){ S.menu[d+'-'+nk]=v; save(); }
+function rndMeal(d,k){ const r=S.recipes[Math.floor(Math.random()*S.recipes.length)]; S.menu[d+'-'+k]=r.id; save(); renderMenu(); toast('🎲 '+r.name,'info'); }
+function randomizeAll(){ DAYS.forEach(d=>{ ['l','d'].forEach(k=>{ S.menu[d+'-'+k]=S.recipes[Math.floor(Math.random()*S.recipes.length)].id; }); }); save(); renderMenu(); toast('🎲 Menú aleatorio generado!','ok'); }
+function clearMenu(){ S.menu=initMenu(); save(); renderMenu(); toast('🗑 Menú limpiado'); }
+
+// ── RENDER RECIPES ─────────────────────────
+const baseIds = BASE.map(r=>r.id);
+function renderRecipes(){
+  const g=document.getElementById('rgrid'); g.innerHTML='';
+  const list=filter==='all'?S.recipes:S.recipes.filter(r=>r.tags.includes(filter));
+  if(!list.length){ g.innerHTML='<p style="color:var(--text4);font-size:.82rem;padding:.5rem;">Sin recetas con este filtro.</p>'; return; }
+  list.forEach(r=>{
+    const isCustom=!baseIds.includes(r.id);
+    const inShop=S.addedToShop.includes(r.id);
+    const c=document.createElement('div'); c.className='rcard'+(isCustom?' custom':''); c.id='rc-'+r.id;
+    c.innerHTML=`<div class="tags">${r.tags.map(t=>`<span class="tag ${t}">${tl(t)}</span>`).join('')}${isCustom?'<span class="tag custom">✨ Mía</span>':''}</div>
+      <h3>${r.name}</h3>
+      <div class="rmeta"><span>⏱ ${r.time||'—'}</span>${r.temp&&r.temp!=='—'?`<span>🌡 ${r.temp}</span>`:''}</div>
+      <div class="rdesc">${r.desc}</div>
+      <div class="rdetail">
+        <div class="dlbl">Ingredientes</div><ul>${r.ingredients.map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="dlbl">Preparación</div><p>${r.steps||'—'}</p>
+        <div class="card-acts">
+          <button class="btn-shop ${inShop?'added':'idle'}" id="sb-${r.id}" onclick="event.stopPropagation();addToShop('${r.id}')">${inShop?'✅ Añadido':'🛒 Añadir a la compra'}</button>
+          ${isCustom?`<button class="btn-del-r" onclick="event.stopPropagation();delRecipe('${r.id}')">🗑 Eliminar</button>`:''}
+        </div>
+      </div>`;
+    c.addEventListener('click',()=>c.classList.toggle('open'));
+    g.appendChild(c);
+  });
+}
+function tl(t){ return{airfryer:'🔥 Airfryer',proteina:'💪 Proteína',vegetal:'🌱 Vegetal',legumbre:'🫘 Legumbre',pescado:'🐟 Pescado',quick:'⚡ Quick'}[t]||t; }
+function filterR(tag,btn){ filter=tag; document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderRecipes(); }
+function addToShop(id){
+  if(S.addedToShop.includes(id))return;
+  const r=S.recipes.find(x=>x.id===id); if(!r)return;
+  (r.shopItems||[]).forEach(([name,qty,cat])=>{ if(!S.shop.find(i=>i.name.toLowerCase()===name.toLowerCase())) S.shop.push({id:'rs-'+Date.now()+'-'+Math.random().toString(36).slice(2),name,qty,cat:cat||'Otros',done:false}); });
+  S.addedToShop.push(id); save();
+  const btn=document.getElementById('sb-'+id);
+  if(btn){ btn.textContent='✅ Añadido'; btn.classList.replace('idle','added'); }
+  toast('🛒 Ingredientes añadidos','ok');
+}
+function delRecipe(id){
+  S.recipes=S.recipes.filter(r=>r.id!==id);
+  DAYS.forEach(d=>{ if(S.menu[d+'-l']===id)S.menu[d+'-l']=''; if(S.menu[d+'-d']===id)S.menu[d+'-d']=''; });
+  save(); renderRecipes(); renderMenu(); toast('🗑 Receta eliminada');
+}
+
+// ── MODAL ──────────────────────────────────
+function toggleTag(el){ el.classList.toggle('active'); }
+function openModal(){ ['r-name','r-time','r-temp','r-desc','r-ing','r-steps'].forEach(id=>document.getElementById(id).value=''); document.querySelectorAll('.tck-lbl').forEach(el=>el.classList.remove('active')); document.getElementById('modal-ov').classList.add('open'); }
+function closeModal(){ document.getElementById('modal-ov').classList.remove('open'); }
+function closeModalOut(e){ if(e.target===document.getElementById('modal-ov'))closeModal(); }
+function saveRecipe(){
+  const name=document.getElementById('r-name').value.trim();
+  const desc=document.getElementById('r-desc').value.trim();
+  const ingRaw=document.getElementById('r-ing').value.trim();
+  if(!name||!desc||!ingRaw){ toast('⚠️ Rellena nombre, descripción e ingredientes'); return; }
+  const tags=[...document.querySelectorAll('.tck-lbl.active')].map(el=>el.getAttribute('data-tag'));
+  const ingredients=ingRaw.split('\n').map(l=>l.trim()).filter(Boolean);
+  S.recipes.push({ id:'c-'+Date.now(), name, tags, time:document.getElementById('r-time').value.trim()||'—', temp:document.getElementById('r-temp').value.trim()||'—', desc, ingredients, steps:document.getElementById('r-steps').value.trim(), shopItems:ingredients.map(i=>[i,'',guessCat(i)]) });
+  save(); closeModal(); renderRecipes(); renderMenu(); toast('✨ Receta guardada!','ok');
+}
+
+// ── SHOPPING ───────────────────────────────
+function renderShop(){
+  const done=S.shop.filter(i=>i.done).length, total=S.shop.length, pct=total?Math.round(done/total*100):0;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-stat').textContent=done+'/'+total;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  const con=document.getElementById('shop-cats'); con.innerHTML='';
+  [...SCATS,'Sin categoría'].forEach(cat=>{
+    const items=cat==='Sin categoría'?S.shop.filter(i=>!SCATS.includes(i.cat)):S.shop.filter(i=>i.cat===cat);
+    if(!items.length)return;
+    const sec=document.createElement('div'); sec.className='scat';
+    sec.innerHTML=`<h3>${cat}</h3><div class="sitems" id="sc-${cat.replace(/\W/g,'_')}"></div>`;
+    con.appendChild(sec);
+    const sl=sec.querySelector('.sitems');
+    items.forEach(item=>{
+      const el=document.createElement('div'); el.className='sitem'+(item.done?' done':'');
+      el.innerHTML=`<input type="checkbox" ${item.done?'checked':''} onchange="toggleSI('${item.id}')"><span class="sitem-name">${item.name}</span><span class="sitem-qty">${item.qty||''}</span><button class="sitem-del" onclick="delSI('${item.id}')" title="Eliminar">✕</button>`;
+      sl.appendChild(el);
+    });
+  });
+}
+function addSI(){
+  const name=document.getElementById('si-name').value.trim();
+  if(!name){ toast('⚠️ Escribe un producto'); return; }
+  S.shop.push({id:'u-'+Date.now(),name,qty:document.getElementById('si-qty').value.trim(),cat:document.getElementById('si-cat').value,done:false});
+  document.getElementById('si-name').value=''; document.getElementById('si-qty').value='';
+  save(); renderShop(); toast('✅ '+name+' añadido','ok');
+}
+function toggleSI(id){ const it=S.shop.find(i=>i.id===id); if(it){ it.done=!it.done; save(); renderShop(); } }
+function delSI(id){ S.shop=S.shop.filter(i=>i.id!==id); save(); renderShop(); }
+function clearDone(){ const n=S.shop.filter(i=>i.done).length; if(!n){ toast('ℹ️ No hay productos marcados'); return; } S.shop=S.shop.filter(i=>!i.done); save(); renderShop(); toast('✅ '+n+' eliminados'); }
+function clearAll(){ S.shop=[]; S.addedToShop=[]; save(); renderShop(); toast('🗑 Lista vaciada'); }
+function menuToShop(){
+  let added=0;
+  DAYS.forEach(d=>['l','d'].forEach(k=>{
+    const id=S.menu[d+'-'+k]; if(!id)return;
+    const r=S.recipes.find(x=>x.id===id); if(!r)return;
+    (r.shopItems||[]).forEach(([name,qty,cat])=>{ if(!S.shop.find(i=>i.name.toLowerCase()===name.toLowerCase())){ S.shop.push({id:'am-'+Date.now()+'-'+Math.random().toString(36).slice(2),name,qty,cat:cat||'Otros',done:false}); added++; } });
+    if(!S.addedToShop.includes(id))S.addedToShop.push(id);
+  }));
+  save();
+  const shopBtn=document.querySelectorAll('.tab-btn')[2];
+  showTab('shop',shopBtn);
+  toast(added?'🛒 '+added+' ingredientes añadidos!':'ℹ️ Todos ya están en la lista',added?'ok':'info');
+}
+
+// ── SHARE VIA URL ─────────────────────────
+function generateShareLink(){
+  try {
+    const payload = { menu: S.menu, shop: S.shop, recipes: S.recipes.filter(r=>!baseIds.includes(r.id)), addedToShop: S.addedToShop };
+    const json = JSON.stringify(payload);
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    const url = window.location.href.split('?')[0].split('#')[0] + '#data=' + b64;
+    // Copy to clipboard
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(()=>{ showShareBanner(url); }).catch(()=>{ showShareBanner(url); });
+    } else { showShareBanner(url); }
+  } catch(e){ toast('⚠️ Error al generar el link'); }
+}
+
+function showShareBanner(url){
+  const banner = document.getElementById('share-banner');
+  const input = document.getElementById('share-url-input');
+  input.value = url;
+  banner.classList.remove('hidden');
+  input.select();
+  toast('🔗 Link generado — ¡cópialo y compártelo!','ok');
+}
+
+function copyShareUrl(){
+  const input = document.getElementById('share-url-input');
+  input.select();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(input.value).then(()=>toast('📋 Link copiado!','ok')).catch(()=>{ document.execCommand('copy'); toast('📋 Link copiado!','ok'); });
+  } else { document.execCommand('copy'); toast('📋 Link copiado!','ok'); }
+}
+
+function loadFromHash(){
+  try {
+    const hash = window.location.hash;
+    if(!hash.startsWith('#data=')) return false;
+    const b64 = hash.slice(6);
+    const json = decodeURIComponent(escape(atob(b64)));
+    const payload = JSON.parse(json);
+    if(payload.menu) S.menu = { ...initMenu(), ...payload.menu };
+    if(payload.shop) S.shop = payload.shop;
+    if(payload.addedToShop) S.addedToShop = payload.addedToShop;
+    if(payload.recipes && payload.recipes.length){
+      payload.recipes.forEach(r=>{ if(!S.recipes.find(x=>x.id===r.id)) S.recipes.push(r); });
+    }
+    save();
+    // Clean URL
+    history.replaceState(null,'',window.location.pathname);
+    return true;
+  } catch(e){ return false; }
+}
+
+// ── STATS ──────────────────────────────────
+function renderStats(){
+  const planned=DAYS.reduce((a,d)=>{if(S.menu[d+'-l'])a++;if(S.menu[d+'-d'])a++;return a;},0);
+  const done=S.shop.filter(i=>i.done).length, total=S.shop.length;
+  const uniq=new Set(); DAYS.forEach(d=>{['l','d'].forEach(k=>{if(S.menu[d+'-'+k])uniq.add(S.menu[d+'-'+k]);});});
+  document.getElementById('sgrid').innerHTML=`
+    <div class="sc"><div class="n" style="color:var(--blue)">${planned}</div><div class="l">Comidas planificadas</div></div>
+    <div class="sc"><div class="n" style="color:var(--green-dark)">${uniq.size}</div><div class="l">Recetas distintas</div></div>
+    <div class="sc"><div class="n" style="color:var(--orange)">${done}/${total}</div><div class="l">Productos comprados</div></div>
+    <div class="sc"><div class="n" style="color:var(--indigo)">${S.recipes.length}</div><div class="l">Recetas en el banco</div></div>`;
+  const sl=document.getElementById('sum-list'); sl.innerHTML='';
+  DAYS.forEach(d=>{
+    const lr=S.menu[d+'-l']?S.recipes.find(r=>r.id===S.menu[d+'-l']):null;
+    const dr=S.menu[d+'-d']?S.recipes.find(r=>r.id===S.menu[d+'-d']):null;
+    const row=document.createElement('div'); row.className='sum-row';
+    row.innerHTML=`<span class="sum-day">${d}</span><span class="sum-meals">${lr||dr?`<span style="color:var(--orange);font-size:.68rem;font-weight:800">☀</span> ${lr?lr.name:'—'} &nbsp; <span style="color:var(--indigo);font-size:.68rem;font-weight:800">🌙</span> ${dr?dr.name:'—'}`:'<span class="sum-empty">Sin planificar</span>'}</span>`;
+    sl.appendChild(row);
+  });
+}
+
+// ── HELPERS ────────────────────────────────
+function guessCat(n){ n=n.toLowerCase(); if(/pollo|muslo|pechuga|carne|beicon|ternera|cerdo/.test(n))return'Carnes y aves'; if(/salmón|merluza|atún|gambas|pescado|bacalao/.test(n))return'Pescados'; if(/tomate|zanahoria|brócoli|espinaca|calabacín|cebolla|ajo|puerro|espárrago|plátano|aguacate|limón|manzana|boniato|pimiento|lechuga|cherry/.test(n))return'Frutas y verduras'; if(/huevo|yogur|queso|feta|mozzarella|leche/.test(n))return'Lácteos y huevos'; if(/lenteja|garbanzo|quinoa|arroz|pasta|avena|pan|harina|tortilla/.test(n))return'Legumbres y cereales'; if(/bote|lata|conserva|tarro|hummus/.test(n))return'Conservas'; return'Otros'; }
+
+let _tt;
+function toast(msg,type=''){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show'+(type?' '+type:''); clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('show'),2800); }
+
+function showTab(tab,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(tab==='shop') renderShop();
+  if(tab==='stats') renderStats();
+}
+
+// ── BOOT ───────────────────────────────────
+load();
+const loadedFromUrl = loadFromHash();
+if(loadedFromUrl) toast('✅ Menú cargado desde el link!','ok');
+renderMenu();
+renderRecipes();
+</script>
+</body>
+</html>
